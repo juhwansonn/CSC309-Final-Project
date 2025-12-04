@@ -1,1 +1,0 @@
-I used AI to fix bugs, ensure the database initialization script followed proper syntax and structure, refactoring and cleaning up my codes. 

@@ -3,30 +3,31 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ requiredRole = 'regular' }) => {
-  const { user, loading } = useAuth();
+  // 1. Destructure 'token' from the context
+  const { user, token, loading } = useAuth(); 
 
   if (loading) {
-    // Show a loading state while fetching user data
     return <div>Loading...</div>;
   }
 
-  if (!user || !user.token) {
-    // Redirect unauthenticated users to the login page
+  // 2. Check 'token' directly (not user.token)
+  //    Also check if 'user' exists, just to be safe
+  if (!token || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Define role clearance based on backend logic (regular=0, cashier=1, manager=2, superuser=3)
   const ROLE_RANKS = { regular: 0, cashier: 1, manager: 2, superuser: 3 };
-  const userRank = ROLE_RANKS[user.role] || 0;
+  
+  // Safety check: ensure user.role exists (it might be null briefly)
+  const userRole = user.role ? user.role.toLowerCase() : 'regular';
+
+  const userRank = ROLE_RANKS[userRole] || 0;
   const requiredRank = ROLE_RANKS[requiredRole] || 0;
   
-  // Check if the user's role meets the minimum required level
   if (userRank < requiredRank) {
-    // Redirect users with insufficient access
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // If authenticated and authorized, render the child route
   return <Outlet />;
 };
 
