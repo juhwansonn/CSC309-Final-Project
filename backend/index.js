@@ -1,22 +1,20 @@
 #!/usr/bin/env node
 "use strict";
 
-let port = null;
+let port = process.env.PORT || 8000;
+
 if (require.main === module) {
   const args = process.argv;
 
-  if (args.length !== 3) {
-    console.error("usage: node index.js port");
-    process.exit(1);
+  if (args.length === 3) {
+    const num = parseInt(args[2], 10);
+    if (!isNaN(num)) {
+      port = num;
+    } else {
+        console.error("error: argument must be an integer.");
+        process.exit(1);
+    }
   }
-
-  const num = parseInt(args[2], 10);
-  if (isNaN(num)) {
-    console.error("error: argument must be an integer.");
-    process.exit(1);
-  }
-
-  port = num;
 }
 
 require("dotenv").config();
