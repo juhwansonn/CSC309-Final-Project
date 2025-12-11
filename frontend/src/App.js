@@ -8,6 +8,10 @@ import EventsPage from './pages/EventsPage';
 import CreateEventPage from './pages/CreateEventPage';
 import PromotionsPage from './pages/PromotionsPage';
 import CreatePromotionPage from './pages/CreatePromotionPage';
+import TransactionsPage from './pages/TransactionsPage';
+import TransferPage from './pages/TransferPage';
+import RedeemPointsPage from './pages/RedeemPointsPage';
+import ProcessRedemptionPage from './pages/ProcessRedemptionPage';
 
 function App() {
   return (
@@ -23,16 +27,21 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/promotions" element={<PromotionsPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/transfer" element={<TransferPage />} /> 
+          <Route path="/redeem" element={<RedeemPointsPage />} />
         </Route>
 
         {/* Manager-only Routes */}
         <Route element={<ProtectedRoute requiredRole="manager" />}>
+        <Route path="/users" element={<AllUsersPage />} />
         <Route path="/events/new" element={<CreateEventPage />} />
         <Route path="/promotions/new" element={<CreatePromotionPage />} />
         </Route>
 
         {/* Cashier Routes */}
         <Route element={<ProtectedRoute requiredRole="cashier" />}>
+        <Route path="/redeem/process" element={<ProcessRedemptionPage />} />
           {/* Add Cashier pages here */}
         </Route>
 
