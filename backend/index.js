@@ -1711,25 +1711,20 @@ app.get(
 );
 
 app.post(
-  "/users/:userId/transactions",
+  "/transactions/transfer",
   requireAuthenticatedUser,
   enforceRoleClearance("regular"),
   async (req, res) => {
-    const recipientId = parsePositiveWhole(req.params.userId);
-    if (!recipientId) {
-      return res.status(400).json({ error: "Invalid recipient id" });
-    }
-
-    const { type, amount, remark } = req.body;
-    if (type !== "transfer") {
-      return res.status(400).json({ error: 'type must be "transfer"' });
-    }
+    // 1. Accept 'targetUtorid' (String) instead of 'userId' (Int)
+    const { targetUtorid, amount, remark } = req.body;
 
     const numericAmount = parsePositiveWholeegerStrict(amount);
     if (!numericAmount) {
-      return res
-        .status(400)
-        .json({ error: "amount must be a positive integer" });
+      return res.status(400).json({ error: "amount must be a positive integer" });
+    }
+
+    if (!targetUtorid || typeof targetUtorid !== "string") {
+        return res.status(400).json({ error: "targetUtorid is required" });
     }
 
     try {
@@ -1737,16 +1732,12 @@ app.post(
         where: { id: req.user.id },
       });
 
-      if (!sender) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
+      if (!sender) return res.status(401).json({ error: "Unauthorized" });
+      if (!sender.verified) return res.status(403).json({ error: "Sender must be verified" });
 
-      if (!sender.verified) {
-        return res.status(403).json({ error: "Sender must be verified" });
-      }
-
+      // 2. Find the recipient by their UtorID
       const recipient = await prisma.user.findUnique({
-        where: { id: recipientId },
+        where: { utorid: targetUtorid },
       });
 
       if (!recipient) {
@@ -1754,40 +1745,24 @@ app.post(
       }
 
       if (recipient.id === sender.id) {
-        return res
-          .status(400)
-          .json({ error: "Cannot transfer points to yourself" });
+        return res.status(400).json({ error: "Cannot transfer points to yourself" });
       }
 
       if (sender.points < numericAmount) {
-        return res
-          .status(400)
-          .json({ error: "Insufficient points for transfer" });
+        return res.status(400).json({ error: "Insufficient points for transfer" });
       }
 
-      const resolvedRemark =
-        remark === undefined || remark === null ? "" : String(remark);
+      const resolvedRemark = remark || "";
 
+      // 3. Perform the transfer
       const transferResult = await prisma.$transaction(async (tx) => {
-        const [freshSender, freshRecipient] = await Promise.all([
-          tx.user.findUnique({
-            where: { id: sender.id },
-            select: { id: true, points: true },
-          }),
-          tx.user.findUnique({
-            where: { id: recipient.id },
-            select: { id: true, points: true },
-          }),
-        ]);
-
-        if (!freshSender || !freshRecipient) {
-          throw new Error("transfer_users_missing");
-        }
-
+        const freshSender = await tx.user.findUnique({ where: { id: sender.id } });
+        
         if (freshSender.points < numericAmount) {
           throw new Error("transfer_insufficient");
         }
 
+        // Sender Transaction (Negative)
         const senderTx = await tx.transaction.create({
           data: {
             utorid: sender.utorid,
@@ -1799,6 +1774,7 @@ app.post(
           },
         });
 
+        // Recipient Transaction (Positive)
         await tx.transaction.create({
           data: {
             utorid: recipient.utorid,
@@ -1810,34 +1786,31 @@ app.post(
           },
         });
 
+        // Update Points
         await tx.user.update({
-          where: { id: freshSender.id },
+          where: { id: sender.id },
           data: { points: { decrement: numericAmount } },
         });
 
-        const updatedRecipient = await tx.user.update({
-          where: { id: freshRecipient.id },
+        await tx.user.update({
+          where: { id: recipient.id },
           data: { points: { increment: numericAmount } },
-          select: { points: true },
         });
 
-        return { senderTx, recipientPoints: updatedRecipient.points };
+        return senderTx;
       });
 
       return res.status(201).json({
-        id: transferResult.senderTx.id,
+        id: transferResult.id,
         sender: sender.utorid,
         recipient: recipient.utorid,
-        type: "transfer",
-        sent: numericAmount,
+        amount: numericAmount,
         remark: resolvedRemark,
-        createdBy: sender.utorid,
       });
+
     } catch (error) {
       if (error?.message === "transfer_insufficient") {
-        return res
-          .status(400)
-          .json({ error: "Insufficient points for transfer" });
+        return res.status(400).json({ error: "Insufficient points for transfer" });
       }
       console.error(error);
       res.status(500).json({ error: "Failed to create transfer" });
