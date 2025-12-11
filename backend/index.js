@@ -31,8 +31,9 @@ const requireAuthenticatedUser = require("./middleware/auth.js");
 const SIGNING_SECRET = process.env.JWT_SECRET;
 const resetRequestBudget = {};
 const ROLE_RANKS = { regular: 0, cashier: 1, manager: 2, superuser: 3 };
+const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:3000';
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: allowedOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
