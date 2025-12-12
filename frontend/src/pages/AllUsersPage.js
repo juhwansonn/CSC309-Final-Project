@@ -14,7 +14,7 @@ const AllUsersPage = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortBy, setSortBy] = useState('name'); // Default sort by name
+    const [sortBy, setSortBy] = useState('name'); 
 
     // 1. ROBUST FETCH FUNCTION
     const fetchUsers = useCallback(async () => {
@@ -29,13 +29,15 @@ const AllUsersPage = () => {
                 }
             });
 
-            // Handle different data structures safely
             let usersArray = [];
             if (res.data.users && Array.isArray(res.data.users)) {
                 usersArray = res.data.users;
                 setTotalPages(res.data.totalPages || 1);
             } else if (Array.isArray(res.data)) {
                 usersArray = res.data;
+            } else if (res.data.results && Array.isArray(res.data.results)) {
+                usersArray = res.data.results;
+                setTotalPages(Math.ceil(res.data.count / 10) || 1);
             }
 
             setUsers(usersArray);
@@ -69,12 +71,14 @@ const AllUsersPage = () => {
     // 2. Verify User
     const handleVerify = async (userId) => {
         try {
+            // FIX: Sending 'verified' (matches DB column) or 'isVerified' (matches backend alias)
             await axios.patch(`${API_BASE_URL}/users/${userId}`, 
-                { isVerified: true }, 
+                { verified: true }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            fetchUsers(); // Refresh UI to show checkmark
+            fetchUsers(); // Refresh UI to update the list
         } catch (err) {
+            console.error(err);
             alert("Verification failed.");
         }
     };
@@ -86,7 +90,7 @@ const AllUsersPage = () => {
         
         try {
             await axios.patch(`${API_BASE_URL}/users/${userId}`, 
-                { isSuspicious: newStatus }, 
+                { suspicious: newStatus }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             fetchUsers();
@@ -135,12 +139,14 @@ const AllUsersPage = () => {
 
             <ul style={{ listStyle: 'none', padding: 0 }}>
                 {Array.isArray(users) && users.map((u) => (
-                    <li key={u.id || u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', borderBottom: '1px solid #eee', backgroundColor: u.isSuspicious ? '#fff3f3' : '#fff' }}>
+                    // FIX: Using u.suspicious instead of u.isSuspicious
+                    <li key={u.id || u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', borderBottom: '1px solid #eee', backgroundColor: u.suspicious ? '#fff3f3' : '#fff' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <strong>{u.name}</strong>
-                                {u.isVerified && <span title="Verified" style={{ cursor:'default' }}>✅</span>}
-                                {u.isSuspicious && <span style={{ color: 'red', fontWeight: 'bold', fontSize: '0.8rem', border: '1px solid red', padding: '2px 4px', borderRadius: '4px' }}>SUSPICIOUS</span>}
+                                {/* FIX: Using u.verified instead of u.isVerified */}
+                                {u.verified && <span title="Verified" style={{ cursor:'default' }}>✅</span>}
+                                {u.suspicious && <span style={{ color: 'red', fontWeight: 'bold', fontSize: '0.8rem', border: '1px solid red', padding: '2px 4px', borderRadius: '4px' }}>SUSPICIOUS</span>}
                             </div>
                             <span style={{ color: '#666', fontSize: '0.9rem' }}>@{u.utorid}</span>
                             <br/>
@@ -151,16 +157,16 @@ const AllUsersPage = () => {
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end' }}>
                             <div style={{ display: 'flex', gap: '5px' }}>
-                                {/* Verify Button */}
-                                {!u.isVerified && (
+                                {/* FIX: Using !u.verified */}
+                                {!u.verified && (
                                     <button onClick={() => handleVerify(u.id || u._id)} style={{...styles.actionBtn, backgroundColor: '#17a2b8'}}>
                                         Verify
                                     </button>
                                 )}
                                 
-                                {/* Suspicious Toggle */}
-                                <button onClick={() => handleSuspiciousToggle(u.id || u._id, u.isSuspicious)} style={{...styles.actionBtn, backgroundColor: u.isSuspicious ? '#6c757d' : '#dc3545'}}>
-                                    {u.isSuspicious ? 'Unflag' : 'Flag Suspicious'}
+                                {/* FIX: Using u.suspicious */}
+                                <button onClick={() => handleSuspiciousToggle(u.id || u._id, u.suspicious)} style={{...styles.actionBtn, backgroundColor: u.suspicious ? '#6c757d' : '#dc3545'}}>
+                                    {u.suspicious ? 'Unflag' : 'Flag Suspicious'}
                                 </button>
                             </div>
 
