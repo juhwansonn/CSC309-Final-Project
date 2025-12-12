@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import AllUsersPage from './pages/AllUsersPage'; 
+import ManagerTransactionsPage from './pages/ManagerTransactionsPage';
 import ProtectedRoute from './components/ProtectedRoute'; 
 import EventsPage from './pages/EventsPage';
 import CreateEventPage from './pages/CreateEventPage';
@@ -16,19 +17,16 @@ import Navbar from './components/Navbar';
 import CreateUserPage from './pages/CreateUserPage';
 import CashierPage from './pages/CashierPage';
 
-
 function App() {
   return (
     <BrowserRouter>
-
       <Navbar />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<LoginPage />} />
-        {/* Add a /reset-password route here */}
 
-        {/* Protected Routes (Authenticated) */}
+        {/* Protected Routes (Authenticated Regular Users & Up) */}
         <Route element={<ProtectedRoute requiredRole="regular" />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventsPage />} />
@@ -40,17 +38,19 @@ function App() {
 
         {/* Manager-only Routes */}
         <Route element={<ProtectedRoute requiredRole="manager" />}>
-        <Route path="/users" element={<AllUsersPage />} />
-        <Route path="/users/new" element={<CreateUserPage />} />
-        <Route path="/events/new" element={<CreateEventPage />} />
-        <Route path="/promotions/new" element={<CreatePromotionPage />} />
+          <Route path="/users" element={<AllUsersPage />} />
+          <Route path="/users/new" element={<CreateUserPage />} />
+          <Route path="/events/new" element={<CreateEventPage />} />
+          <Route path="/promotions/new" element={<CreatePromotionPage />} />
+          
+          {/* NEW: Global Transaction View for Managers */}
+          <Route path="/manager/transactions" element={<ManagerTransactionsPage />} />
         </Route>
 
         {/* Cashier Routes */}
         <Route element={<ProtectedRoute requiredRole="cashier" />}>
-        <Route path="/redeem/process" element={<ProcessRedemptionPage />} />
-        <Route path="/cashier" element={<CashierPage />} />
-          {/* Add Cashier pages here */}
+          <Route path="/redeem/process" element={<ProcessRedemptionPage />} />
+          <Route path="/cashier" element={<CashierPage />} />
         </Route>
 
         {/* Fallback */}
