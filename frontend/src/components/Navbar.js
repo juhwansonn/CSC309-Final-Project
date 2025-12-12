@@ -30,7 +30,8 @@ const Navbar = () => {
         <nav style={styles.nav}>
             <div style={styles.container}>
                 <div style={styles.brand}>
-                    <Link to="/profile" style={styles.brandLink}>CSSU Rewards</Link>
+                    {/* UPDATED: Link brand logo to the root path (DashboardPage.js) */}
+                    <Link to="/" style={styles.brandLink}>CSSU Rewards Dashboard</Link>
                 </div>
 
                 <div style={styles.links}>
