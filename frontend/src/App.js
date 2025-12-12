@@ -7,9 +7,10 @@ import ManagerTransactionsPage from './pages/ManagerTransactionsPage';
 import ProtectedRoute from './components/ProtectedRoute'; 
 import EventsPage from './pages/EventsPage';
 import CreateEventPage from './pages/CreateEventPage';
+import ManageEventPage from './pages/ManageEventPage';
 import PromotionsPage from './pages/PromotionsPage';
 import CreatePromotionPage from './pages/CreatePromotionPage';
-import TransactionsPage from './pages/TransactionsPage';
+import TransactionsPage from './pages/TransactionsPage'; 
 import TransferPage from './pages/TransferPage';
 import RedeemPointsPage from './pages/RedeemPointsPage';
 import ProcessRedemptionPage from './pages/ProcessRedemptionPage';
@@ -26,7 +27,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<LoginPage />} />
 
-        {/* Protected Routes (Authenticated Regular Users & Up) */}
+        {/* Protected Routes (Authenticated) */}
         <Route element={<ProtectedRoute requiredRole="regular" />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventsPage />} />
@@ -40,10 +41,12 @@ function App() {
         <Route element={<ProtectedRoute requiredRole="manager" />}>
           <Route path="/users" element={<AllUsersPage />} />
           <Route path="/users/new" element={<CreateUserPage />} />
-          <Route path="/events/new" element={<CreateEventPage />} />
-          <Route path="/promotions/new" element={<CreatePromotionPage />} />
           
-          {/* NEW: Global Transaction View for Managers */}
+          <Route path="/events/new" element={<CreateEventPage />} />
+          {/* NEW: Event Management Route */}
+          <Route path="/events/:id/manage" element={<ManageEventPage />} />
+          
+          <Route path="/promotions/new" element={<CreatePromotionPage />} />
           <Route path="/manager/transactions" element={<ManagerTransactionsPage />} />
         </Route>
 
@@ -53,7 +56,6 @@ function App() {
           <Route path="/cashier" element={<CashierPage />} />
         </Route>
 
-        {/* Fallback */}
         <Route path="*" element={<div>404 Not Found</div>} />
         <Route path="/unauthorized" element={<div>403 Unauthorized</div>} />
       </Routes>
