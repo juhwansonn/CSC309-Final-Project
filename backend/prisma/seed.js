@@ -7,24 +7,24 @@ const getIsoDate = (daysOffset) => {
     return date.toISOString();
 };
 
-const demoPassword = "password123";
+const demoPassword = "Password123!";
 const usersData = [
-    { utorid: 'superuser01', name: 'Althea Super', email: 'althea.su@utoronto.ca', role: 'superuser', points: 10000, verified: true },
-    { utorid: 'manager01', name: 'Ben Manager', email: 'ben.mgr@utoronto.ca', role: 'manager', points: 5000, verified: true },
-    { utorid: 'manager02', name: 'Chris Manager', email: 'chris.mgr@utoronto.ca', role: 'manager', points: 4500, verified: true },
-    { utorid: 'cashier01', name: 'Diana Cash', email: 'diana.cash@utoronto.ca', role: 'cashier', points: 2000, verified: true },
-    { utorid: 'cashier02', name: 'Evan Cash', email: 'evan.cash@utoronto.ca', role: 'cashier', points: 1800, verified: true },
+    { utorid: 'superuser01', name: 'Althea Super', email: 'althea.su@utoronto.ca', role: 'superuser', points: 10000, verified: true, suspicious: false },
+    { utorid: 'manager01', name: 'Ben Manager', email: 'ben.mgr@utoronto.ca', role: 'manager', points: 5000, verified: true, suspicious: false },
+    { utorid: 'manager02', name: 'Chris Manager', email: 'chris.mgr@utoronto.ca', role: 'manager', points: 4500, verified: true, suspicious: false },
+    { utorid: 'cashier01', name: 'Diana Cash', email: 'diana.cash@utoronto.ca', role: 'cashier', points: 2000, verified: true, suspicious: false },
+    { utorid: 'cashier02', name: 'Evan Cash', email: 'evan.cash@utoronto.ca', role: 'cashier', points: 1800, verified: true, suspicious: false },
     
-    { utorid: 'reguser01', name: 'Fiona Reg', email: 'fiona.reg@utoronto.ca', role: 'regular', points: 1500, verified: true },
-    { utorid: 'reguser02', name: 'Gary Reg', email: 'gary.reg@utoronto.ca', role: 'regular', points: 1200, verified: false },
-    { utorid: 'reguser03', name: 'Holly Reg', email: 'holly.reg@utoronto.ca', role: 'regular', points: 1000, verified: true },
-    { utorid: 'reguser04', name: 'Ian Reg', email: 'ian.reg@utoronto.ca', role: 'regular', points: 800, verified: true },
-    { utorid: 'reguser05', name: 'Jenna Reg', email: 'jenna.reg@utoronto.ca', role: 'regular', points: 600, verified: true },
-    { utorid: 'reguser06', name: 'Kyle Reg', email: 'kyle.reg@utoronto.ca', role: 'regular', points: 400, verified: true },
-    { utorid: 'reguser07', name: 'Lia Reg', email: 'lia.reg@utoronto.ca', role: 'regular', points: 200, verified: true },
-    { utorid: 'reguser08', name: 'Mark Reg', email: 'mark.reg@utoronto.ca', role: 'regular', points: 100, verified: true },
-    { utorid: 'reguser09', name: 'Nora Reg', email: 'nora.reg@utoronto.ca', role: 'regular', points: 50, verified: true },
-    { utorid: 'reguser10', name: 'Owen Reg', email: 'owen.reg@utoronto.ca', role: 'regular', points: 10, verified: true },
+    { utorid: 'reguser01', name: 'Fiona Reg', email: 'fiona.reg@utoronto.ca', role: 'regular', points: 1500, verified: true, suspicious: false },
+    { utorid: 'reguser02', name: 'Gary Reg', email: 'gary.reg@utoronto.ca', role: 'regular', points: 1200, verified: false, suspicious: false },
+    { utorid: 'reguser03', name: 'Holly Reg', email: 'holly.reg@utoronto.ca', role: 'regular', points: 1000, verified: true, suspicious: false },
+    { utorid: 'reguser04', name: 'Ian Reg', email: 'ian.reg@utoronto.ca', role: 'regular', points: 800, verified: true, suspicious: false },
+    { utorid: 'reguser05', name: 'Jenna Reg', email: 'jenna.reg@utoronto.ca', role: 'regular', points: 600, verified: true, suspicious: false },
+    { utorid: 'reguser06', name: 'Kyle Reg', email: 'kyle.reg@utoronto.ca', role: 'regular', points: 400, verified: true, suspicious: false },
+    { utorid: 'reguser07', name: 'Lia Reg', email: 'lia.reg@utoronto.ca', role: 'regular', points: 200, verified: true, suspicious: false },
+    { utorid: 'reguser08', name: 'Mark Reg', email: 'mark.reg@utoronto.ca', role: 'regular', points: 100, verified: true, suspicious: false },
+    { utorid: 'reguser09', name: 'Nora Reg', email: 'nora.reg@utoronto.ca', role: 'regular', points: 50, verified: true, suspicious: false },
+    { utorid: 'reguser10', name: 'Owen Reg', email: 'owen.reg@utoronto.ca', role: 'regular', points: 10, verified: true, suspicious: false },
 ];
 
 const promotionsData = [
