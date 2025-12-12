@@ -2306,7 +2306,7 @@ app.post(
           capacity: capacity,
           pointsRemain: points,
           pointsAwarded: 0,
-          published: false,
+          published: true,
         },
         include: {
           organizers: true,
