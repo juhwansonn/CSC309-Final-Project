@@ -2,14 +2,16 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
+import DashboardPage from './pages/DashboardPage';
 import AllUsersPage from './pages/AllUsersPage'; 
 import ManagerTransactionsPage from './pages/ManagerTransactionsPage';
 import ProtectedRoute from './components/ProtectedRoute'; 
 import EventsPage from './pages/EventsPage';
 import CreateEventPage from './pages/CreateEventPage';
-import ManageEventPage from './pages/ManageEventPage';
+import ManageEventPage from './pages/ManageEventPage'; 
 import PromotionsPage from './pages/PromotionsPage';
 import CreatePromotionPage from './pages/CreatePromotionPage';
+import EditPromotionPage from './pages/EditPromotionPage'; 
 import TransactionsPage from './pages/TransactionsPage'; 
 import TransferPage from './pages/TransferPage';
 import RedeemPointsPage from './pages/RedeemPointsPage';
@@ -25,10 +27,12 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<LoginPage />} />
-
+        
         {/* Protected Routes (Authenticated) */}
         <Route element={<ProtectedRoute requiredRole="regular" />}>
+          {/* ROOT PATH is now the Dashboard */}
+          <Route path="/" element={<DashboardPage />} /> 
+          
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/promotions" element={<PromotionsPage />} />
@@ -43,10 +47,11 @@ function App() {
           <Route path="/users/new" element={<CreateUserPage />} />
           
           <Route path="/events/new" element={<CreateEventPage />} />
-          {/* NEW: Event Management Route */}
           <Route path="/events/:id/manage" element={<ManageEventPage />} />
           
           <Route path="/promotions/new" element={<CreatePromotionPage />} />
+          <Route path="/promotions/:id/edit" element={<EditPromotionPage />} /> 
+          
           <Route path="/manager/transactions" element={<ManagerTransactionsPage />} />
         </Route>
 

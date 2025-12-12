@@ -10,6 +10,7 @@ const PromotionsPage = () => {
     const { user, token } = useAuth();
     const navigate = useNavigate();
 
+    // State for Pagination & Sorting
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [sortOrder, setSortOrder] = useState('ending_soon'); 
@@ -25,7 +26,7 @@ const PromotionsPage = () => {
                     params: { 
                         page: page,
                         limit: LIMIT,
-                        orderBy: sortOrder 
+                        orderBy: sortOrder
                     }
                 });
                 setPromotions(response.data.results);
@@ -64,6 +65,7 @@ const PromotionsPage = () => {
                 )}
             </div>
 
+            {/* --- SORT BAR --- */}
             <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '5px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <label style={{ fontWeight: 'bold' }}>Sort By:</label>
                 <select 
@@ -101,18 +103,28 @@ const PromotionsPage = () => {
                         </div>
 
                         {isManager && (
-                            <button 
-                                onClick={() => handleDelete(promo.id)}
-                                style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', marginLeft: '15px' }}
-                            >
-                                Delete
-                            </button>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                {/* NEW: Edit Button */}
+                                <button 
+                                    onClick={() => navigate(`/promotions/${promo.id}/edit`)}
+                                    style={{ backgroundColor: '#ffc107', color: 'black', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', marginLeft: '15px' }}
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    onClick={() => handleDelete(promo.id)}
+                                    style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         )}
                     </div>
                 ))}
                 {promotions.length === 0 && <p style={{ textAlign: 'center', color: '#666' }}>No active promotions found.</p>}
             </div>
 
+            {/* --- Pagination Controls --- */}
             {totalPages > 1 && (
                 <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
                     <button 
