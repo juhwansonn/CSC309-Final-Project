@@ -1,4 +1,3 @@
-// frontend/src/pages/PromotionsPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../api/config';
@@ -11,7 +10,7 @@ const PromotionsPage = () => {
     const { user, token } = useAuth();
     const navigate = useNavigate();
 
-    const canCreate = user && (user.role === 'manager' || user.role === 'superuser');
+    const isManager = user && (user.role === 'manager' || user.role === 'superuser');
 
     useEffect(() => {
         const fetchPromotions = async () => {
@@ -55,7 +54,13 @@ const PromotionsPage = () => {
                 {promotions.map((promo) => (
                     <div key={promo.id} style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '8px', background: '#f9f9f9', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                            <h3 style={{margin: '0 0 5px 0'}}>{promo.name} <span style={{fontSize: '0.8em', color: '#666'}}>({promo.type})</span></h3>
+                            {/* --- THE CHANGE: Added #{promo.id} here --- */}
+                            <h3 style={{margin: '0 0 5px 0'}}>
+                                <span style={{ color: '#007bff', marginRight: '8px' }}>#{promo.id}</span>
+                                {promo.name} 
+                                <span style={{fontSize: '0.8em', color: '#666', marginLeft: '8px'}}>({promo.type})</span>
+                            </h3>
+
                             <p style={{margin: '5px 0'}}>{promo.description}</p>
                             <p style={{margin: '5px 0', fontSize: '0.9rem', color: '#555'}}><strong>Valid until:</strong> {new Date(promo.endTime).toLocaleDateString()}</p>
                             
@@ -66,7 +71,6 @@ const PromotionsPage = () => {
                             </div>
                         </div>
 
-                        {/* Delete Button */}
                         {isManager && (
                             <button 
                                 onClick={() => handleDelete(promo.id)}
