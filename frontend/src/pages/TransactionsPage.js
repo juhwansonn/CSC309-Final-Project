@@ -74,13 +74,18 @@ const TransactionsPage = () => {
                 </thead>
                 <tbody>
                     {transactions.map((tx) => {
-                        // "Nice" Display Logic
                         let details = tx.remark || '-';
                         let typeLabel = tx.type;
                         let typeColor = '#333';
 
+                 
+                        let displayAmount = tx.amount;
+
+                        if (tx.type === 'redemption') {
+                            displayAmount = -Math.abs(tx.amount);
+                        }
+
                         if (tx.type === 'transfer') {
-                            // Use the data we added in the backend
                             if (tx.amount < 0) {
                                 typeLabel = "Sent";
                                 typeColor = '#d9534f'; // Red
@@ -96,6 +101,9 @@ const TransactionsPage = () => {
                             typeColor = '#fd7e14'; // Orange
                         }
 
+                        const amountColor = displayAmount >= 0 ? 'green' : 'red';
+                        const sign = displayAmount > 0 ? '+' : '';
+
                         return (
                             <tr key={tx.id}>
                                 <td style={{ padding: '10px' }}>{new Date(tx.createdAt).toLocaleDateString()}</td>
@@ -103,8 +111,8 @@ const TransactionsPage = () => {
                                     {typeLabel}
                                 </td>
                                 <td style={{ padding: '10px' }}>{details}</td>
-                                <td style={{ padding: '10px', textAlign: 'right', color: tx.amount >= 0 ? 'green' : 'red', fontWeight: 'bold' }}>
-                                    {tx.amount > 0 ? '+' : ''}{tx.amount}
+                                <td style={{ padding: '10px', textAlign: 'right', color: amountColor, fontWeight: 'bold' }}>
+                                    {sign}{displayAmount}
                                 </td>
                             </tr>
                         );
