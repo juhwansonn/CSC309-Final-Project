@@ -2044,130 +2044,79 @@ app.get("/events", requireAuthenticatedUser, async (req, res) => {
     page: qpage,
     limit,
     published,
+    orderBy,
   } = req.query;
 
   let where = {};
-  let pageNum = 1;
-  let take = 10;
-  if (name !== undefined) {
-    where.name = name;
-  }
-  if (location !== undefined) {
-    where.location = location;
-  }
+  
+  if (name) where.name = { contains: name }; 
+  if (location) where.location = { contains: location };
 
   if (started !== undefined) {
     const parsedStarted = interpretBooleanFlag(started);
-    if (parsedStarted === null) {
-      return res.status(400).json({ error: "Invalid type for started" });
-    }
-    where.startTime = parsedStarted ? { lt: new Date() } : { gt: new Date() };
+    if (parsedStarted !== null) where.startTime = parsedStarted ? { lt: new Date() } : { gt: new Date() };
   }
   if (ended !== undefined) {
     const parsedEnded = interpretBooleanFlag(ended);
-    if (parsedEnded === null) {
-      return res.status(400).json({ error: "Invalid type for ended" });
-    }
-    where.endTime = parsedEnded ? { lt: new Date() } : { gt: new Date() };
+    if (parsedEnded !== null) where.endTime = parsedEnded ? { lt: new Date() } : { gt: new Date() };
   }
 
-  if (qpage !== undefined) {
-    const parsed = parsePositiveWhole(qpage);
-    if (!parsed) {
-      return res.status(400).json({ error: "Invalid type for page" });
-    }
-    pageNum = parsed;
-  }
-
-  if (limit !== undefined) {
-    const parsedLimit = parsePositiveWhole(limit);
-    if (!parsedLimit) {
-      return res.status(400).json({ error: "Invalid type for limit" });
-    }
-
-    take = parsedLimit;
-  }
-
+  let pageNum = parsePositiveWhole(qpage) || 1;
+  let take = parsePositiveWhole(limit) || 10;
   const skip = (pageNum - 1) * take;
-
-  if (started === "true" && ended === "true") {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Start time and end time are listed. Only one should be provided.",
-      }); //passed
-  }
 
   if (published !== undefined) {
     if (published === "false") {
       if (roleLower === "manager" || roleLower === "superuser") {
         where.published = false;
       } else {
-        return res
-          .status(403)
-          .json({
-            error: "Only managers or higher, can view published events",
-          });
-      } //passed
+        return res.status(403).json({ error: "Only managers or higher can view unpublished events" });
+      }
     } else {
       where.published = true;
     }
-  } else if (published === undefined) {
-    if (roleLower !== "manager" && roleLower !== "superuser") {
-      where.published = true; //passed
-    }
+  } else if (roleLower !== "manager" && roleLower !== "superuser") {
+    where.published = true;
   }
 
-  const events = await prisma.event.findMany({
-    where,
-    include: { guests: true },
-  });
+  let orderByClause = { startTime: 'asc' }; 
+  if (orderBy === 'date_desc') orderByClause = { startTime: 'desc' };
+  if (orderBy === 'capacity_desc') orderByClause = { capacity: 'desc' };
+  if (orderBy === 'points_desc') orderByClause = { pointsAwarded: 'desc' };
 
-  let filtered = events;
+  try {
+    const total = await prisma.event.count({ where });
+    
+    const events = await prisma.event.findMany({
+      where,
+      include: { guests: true },
+      orderBy: orderByClause,
+      skip,
+      take,
+    });
 
-  if (showFull !== undefined) {
-    const parsedShowFull = interpretBooleanFlag(showFull);
-    if (parsedShowFull === null) {
-      return res.status(400).json({ error: "Invalid type for showFull" });
+    let results = events;
+    if (showFull !== undefined) {
+      const parsedShowFull = interpretBooleanFlag(showFull);
+      if (parsedShowFull === false) {
+        results = results.filter((event) => !hasEventReachedCapacity(event));
+      }
     }
-    if (!parsedShowFull) {
-      filtered = events.filter((event) => !hasEventReachedCapacity(event));
-    }
-  } else {
-    filtered = events.filter((event) => !hasEventReachedCapacity(event));
-  }
 
-  const resultRegular = filtered
-    .map((event) => {
-      const {
-        description,
-        organizers,
-        guests,
-        published,
-        pointsRemain,
-        pointsAwarded,
-        ...rest
-      } = event;
-      return { ...rest, numGuests: guests.length };
-    })
-    .slice(skip, take + skip);
+    const finalResults = results.map((event) => {
+      const { guests, organizers, ...rest } = event;
+      if (roleLower === "manager" || roleLower === "superuser") {
+         return { ...event, numGuests: guests.length };
+      }
+      const { pointsRemain, pointsAwarded, published, ...safeEvent } = rest;
+      return { ...safeEvent, numGuests: guests.length };
+    });
 
-  const resultHigher = filtered
-    .map((event) => {
-      const { description, organizers, guests, ...rest } = event;
-      return { ...rest, numGuests: guests.length };
-    })
-    .slice(skip, take + skip);
+    return res.status(200).json({ count: total, results: finalResults });
 
-  if (roleLower === "manager" || roleLower === "superuser") {
-    return res
-      .status(200)
-      .json({ count: filtered.length, results: resultHigher });
-  } else {
-    return res
-      .status(200)
-      .json({ count: filtered.length, results: resultRegular });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
@@ -3140,179 +3089,78 @@ app.post(
 );
 
 app.get("/promotions", requireAuthenticatedUser, async (req, res) => {
-  
-
-  
-
   try {
     const filters = mergeFilterSources(req.query, req.body);
-    const nameRaw = digFilterValue(filters, "name");
-    const typeRaw = digFilterValue(filters, "type");
-    const startedRaw = digFilterValue(filters, "started");
-    const endedRaw = digFilterValue(filters, "ended");
-    const pageRaw = digFilterValue(filters, "page");
-    const limitRaw = digFilterValue(filters, "limit");
+    const nameRaw = resolveFilterInput(filters, req, "name");
+    const typeRaw = resolveFilterInput(filters, req, "type");
+    const pageRaw = resolveFilterInput(filters, req, "page");
+    const limitRaw = resolveFilterInput(filters, req, "limit");
+    const sortRaw = req.query.orderBy; // NEW
 
-    const normalizedName =
-      typeof nameRaw === "string" ? nameRaw.trim().toLowerCase() : "";
-    const normalizedType =
-      typeof typeRaw === "string" ? typeRaw.trim().toLowerCase() : undefined;
-
-    const userRole = (req.user.role || "").toUpperCase();
-    const isPrivileged = userRole === "MANAGER" || userRole === "SUPERUSER";
-    const restrictToAvailable =
-      userRole === "REGULAR" || userRole === "CASHIER";
-    const now = new Date();
-
-    const pageNum =
-      pageRaw === undefined || pageRaw === null
-        ? 1
-        : parsePositiveWhole(pageRaw);
-    const limitNum =
-      limitRaw === undefined || limitRaw === null
-        ? 10
-        : parsePositiveWhole(limitRaw);
-
-    if (!pageNum || !limitNum) {
-      return res.status(400).json({ error: "invalid pagination values" });
-    }
-
-    if (startedRaw !== undefined && endedRaw !== undefined) {
-      return res
-        .status(400)
-        .json({ error: "cannot specify both started and ended" });
-    }
+    const pageNum = parsePositiveWhole(pageRaw) || 1;
+    const limitNum = parsePositiveWhole(limitRaw) || 10;
+    const skip = (pageNum - 1) * limitNum;
 
     const where = {};
+    
+    // Name Search
+    if (nameRaw) where.name = { contains: nameRaw.trim() };
 
-    if (normalizedType) {
-      if (
-        normalizedType !== "automatic" &&
-        normalizedType !== "onetime" &&
-        normalizedType !== "one-time"
-      ) {
-        return res
-          .status(400)
-          .json({
-            error: 'type must be either "automatic" or "one-time"',
-          });
-      }
-      where.type =
-        normalizedType === "one-time" ? "onetime" : normalizedType;
+    // Type Filter
+    if (typeRaw) {
+      const normalizedType = typeRaw.trim().toLowerCase();
+      if (normalizedType === "one-time") where.type = "onetime";
+      else if (normalizedType === "automatic") where.type = "automatic";
     }
 
-    if (restrictToAvailable) {
+    // Role Restrictions
+    const userRole = (req.user.role || "").toUpperCase();
+    const isPrivileged = userRole === "MANAGER" || userRole === "SUPERUSER";
+    const now = new Date();
+
+    if (!isPrivileged) {
       where.startTime = { lte: now };
       where.endTime = { gte: now };
-    } else {
-      if (startedRaw !== undefined) {
-        const parsedStarted = interpretBooleanFlag(startedRaw);
-        if (parsedStarted === null) {
-          return res.status(400).json({ error: "invalid started value" });
-        }
-        where.startTime = parsedStarted ? { lte: now } : { gt: now };
-      }
-      if (endedRaw !== undefined) {
-        const parsedEnded = interpretBooleanFlag(endedRaw);
-        if (parsedEnded === null) {
-          return res.status(400).json({ error: "invalid ended value" });
-        }
-        where.endTime = parsedEnded ? { lte: now } : { gt: now };
-      }
     }
 
-    const selection = {
-      id: true,
-      name: true,
-      type: true,
-      endTime: true,
-      minSpending: true,
-      rate: true,
-      points: true,
-      ...(isPrivileged ? { startTime: true } : {}),
-    };
+    // --- NEW: SORTING LOGIC ---
+    let orderBy = { id: 'asc' };
+    if (sortRaw === 'rate') orderBy = { rate: 'desc' }; // Best rate first
+    if (sortRaw === 'points') orderBy = { points: 'desc' }; // Most points first
+    if (sortRaw === 'min_spend') orderBy = { minSpending: 'asc' }; // Lowest spend first
+    if (sortRaw === 'ending_soon') orderBy = { endTime: 'asc' };
 
-    let usedPromotionIds = new Set();
-    if (restrictToAvailable) {
-      const usages = await prisma.usage.findMany({
-        where: { userId: req.user.id },
-        select: { promotionId: true },
-      });
-      usedPromotionIds = new Set(usages.map((usage) => usage.promotionId));
-    }
-
-    const offset = (pageNum - 1) * limitNum;
-    const needsPostFilter =
-      restrictToAvailable || Boolean(normalizedName);
-
-    const baseQuery = {
+    const total = await prisma.promotion.count({ where });
+    const promotions = await prisma.promotion.findMany({
       where,
-      orderBy: { id: "asc" },
-      select: selection,
-    };
-
-    const applyNameFilter = (promotion) =>
-      !normalizedName ||
-      promotion.name.toLowerCase().includes(normalizedName);
-    const applyUsageFilter = (promotion) =>
-      !restrictToAvailable || !usedPromotionIds.has(promotion.id);
-    const formatPromotion = (promotion) => {
-      const response = {
-        id: promotion.id,
-        name: promotion.name,
-        type: promotion.type,
-        endTime: promotion.endTime?.toISOString(),
-        minSpending: promotion.minSpending,
-        rate: promotion.rate,
-        points: promotion.points,
-      };
-      if (isPrivileged) {
-        response.startTime = promotion.startTime?.toISOString();
-      }
-      return response;
-    };
-
-    if (needsPostFilter) {
-      const allPromotions = await prisma.promotion.findMany(baseQuery);
-      const filtered = allPromotions
-        .filter(applyNameFilter)
-        .filter(applyUsageFilter);
-
-      if (filtered.length > 0 && offset >= filtered.length) {
-        return res.status(400).json({ error: "page/limit too large" });
-      }
-
-      const paged = filtered.slice(offset, offset + limitNum);
-      return res
-        .status(200)
-        .json({
-          count: filtered.length,
-          results: paged.map(formatPromotion),
-        });
-    }
-
-    const count = await prisma.promotion.count({ where });
-    if (count > 0 && offset >= count) {
-      return res.status(400).json({ error: "page/limit too large" });
-    }
-
-    const results = await prisma.promotion.findMany({
-      ...baseQuery,
-      skip: offset,
+      orderBy,
+      skip,
       take: limitNum,
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        description: true, // Included description
+        endTime: true,
+        minSpending: true,
+        rate: true,
+        points: true,
+        startTime: isPrivileged, // Only show start time to managers
+      },
     });
 
-    res
-      .status(200)
-      .json({
-        count,
-        results: results.map(formatPromotion),
-      });
+    // Formatting dates
+    const results = promotions.map(p => ({
+        ...p,
+        endTime: p.endTime?.toISOString(),
+        startTime: p.startTime?.toISOString()
+    }));
+
+    res.status(200).json({ count: total, results });
+
   } catch (error) {
     console.error("Error in /promotions:", error);
-    res
-      .status(500)
-      .json({ error: "Failed to fetch promotions", details: error.message });
+    res.status(500).json({ error: "Failed to fetch promotions" });
   }
 });
 

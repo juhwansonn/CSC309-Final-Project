@@ -1,4 +1,3 @@
-// frontend/src/pages/EventsPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../api/config';
@@ -13,25 +12,24 @@ const EventsPage = () => {
 
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [sortOrder, setSortOrder] = useState('date_asc');
     const LIMIT = 5;
 
-    // Helper to check if user has Manager/Superuser privileges
     const isManager = user && (user.role === 'manager' || user.role === 'superuser');
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                // Fetch events (Backend handles filtering published vs all based on role)
                 const response = await axios.get(`${API_BASE_URL}/events`, {
                     headers: { Authorization: `Bearer ${token}` },
                     params: { 
                         page: page,
-                        limit: LIMIT   
+                        limit: LIMIT,
+                        orderBy: sortOrder
                     }
                 });
                 setEvents(response.data.results);
 
-                // Calculate total pages based on total count from backend
                 const totalCount = response.data.count;
                 setTotalPages(Math.ceil(totalCount / LIMIT));
 
@@ -41,7 +39,7 @@ const EventsPage = () => {
             }
         };
         fetchEvents();
-    }, [token, page]);
+    }, [token, page, sortOrder]);
 
     const handleRSVP = async (eventId) => {
         try {
@@ -49,24 +47,19 @@ const EventsPage = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert("Success! You are on the guest list.");
-            // Reload page to update numbers
             window.location.reload();
         } catch (err) {
             alert(err.response?.data?.error || "RSVP Failed");
         }
     };
 
-    // NEW: Handle Delete
     const handleDelete = async (eventId) => {
-        if (!window.confirm("Are you sure you want to delete this event? This cannot be undone.")) {
-            return;
-        }
+        if (!window.confirm("Are you sure you want to delete this event?")) return;
 
         try {
             await axios.delete(`${API_BASE_URL}/events/${eventId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            // Remove from list immediately so user sees it disappear
             setEvents(events.filter(e => e.id !== eventId));
             alert("Event deleted successfully.");
         } catch (err) {
@@ -77,15 +70,30 @@ const EventsPage = () => {
 
     return (
         <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-            <h2>Upcoming Events</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2>Upcoming Events</h2>
+                {isManager && (
+                    <button onClick={() => navigate('/events/new')} style={{ padding: '10px 15px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                        + New Event
+                    </button>
+                )}
+            </div>
+
+            <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '5px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <label style={{ fontWeight: 'bold' }}>Sort By:</label>
+                <select 
+                    value={sortOrder} 
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                    <option value="date_asc">Date (Soonest First)</option>
+                    <option value="date_desc">Date (Latest First)</option>
+                    <option value="capacity_desc">Capacity (Highest)</option>
+                    <option value="points_desc">Points Awarded (Highest)</option>
+                </select>
+            </div>
+
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            
-            {/* Create Button (Managers Only) */}
-            {isManager && (
-                <button onClick={() => navigate('/events/new')} style={{ marginBottom: '20px', padding: '10px 15px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                    + Create New Event
-                </button>
-            )}
 
             <div style={{ display: 'grid', gap: '20px' }}>
                 {events.map((event) => (
@@ -95,7 +103,6 @@ const EventsPage = () => {
                             <h3 style={{margin: 0}}>{event.name}</h3>
                             
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                {/* RSVP Button (Visible to everyone) */}
                                 <button 
                                     onClick={() => handleRSVP(event.id)}
                                     style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
@@ -103,7 +110,6 @@ const EventsPage = () => {
                                     Join
                                 </button>
 
-                                {/* DELETE Button (Only for Managers) */}
                                 {isManager && (
                                     <button 
                                         onClick={() => handleDelete(event.id)}
@@ -119,15 +125,14 @@ const EventsPage = () => {
                         <p style={{ margin: '5px 0' }}><strong>Time:</strong> {new Date(event.startTime).toLocaleString()} - {new Date(event.endTime).toLocaleString()}</p>
                         <p style={{ margin: '10px 0', color: '#555' }}>{event.description}</p>
                         <p style={{ margin: '5px 0', fontSize: '0.9em', color: '#666' }}>
-                            <strong>Guests:</strong> {event.numGuests} / {event.capacity}
+                            <strong>Guests:</strong> {event.numGuests} / {event.capacity} | <strong>Points:</strong> {event.pointsAwarded}
                         </p>
                     </div>
                 ))}
                 
-                {events.length === 0 && <p>No events found.</p>}
+                {events.length === 0 && <p style={{ textAlign: 'center', color: '#666' }}>No events found.</p>}
             </div>
 
-            {/* --- Pagination Controls --- */}
             {totalPages > 1 && (
                 <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
                     <button 
