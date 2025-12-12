@@ -85,7 +85,7 @@ const AllUsersPage = () => {
             {error && <p style={{color: 'red'}}>{error}</p>}
 
             <ul style={{ listStyle: 'none', padding: 0 }}>
-                {users.map((u) => (
+                {Array.isArray(users) && users.length > 0 && users.map((u) => (
                     <li key={u.id || u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', borderBottom: '1px solid #eee', backgroundColor: '#fff' }}>
                         <div>
                             <strong>{u.name}</strong> 
