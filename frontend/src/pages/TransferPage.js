@@ -1,4 +1,3 @@
-// frontend/src/pages/TransferPage.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +7,6 @@ import { useAuth } from '../context/AuthContext';
 const TransferPage = () => {
     const { token } = useAuth();
     const navigate = useNavigate();
-    // Changed state name to be clear it's a string ID
     const [targetUtorid, setTargetUtorid] = useState(''); 
     const [amount, setAmount] = useState('');
     const [remark, setRemark] = useState('');
@@ -18,12 +16,11 @@ const TransferPage = () => {
         e.preventDefault();
         try {
             const payload = {
-                targetUtorid: targetUtorid, // Send the string ID
+                targetUtorid: targetUtorid,
                 amount: parseInt(amount),
                 remark: remark
             };
 
-            // Use the new endpoint
             await axios.post(`${API_BASE_URL}/transactions/transfer`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });

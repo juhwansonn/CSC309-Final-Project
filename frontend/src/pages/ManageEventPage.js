@@ -148,8 +148,7 @@ const ManageEventPage = () => {
             {success && <div style={{ color: 'green', marginBottom: '10px' }}>{success}</div>}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-                
-                {/* --- LEFT COLUMN: EDIT DETAILS --- */}
+
                 <div>
                     <h3>Edit Details</h3>
                     <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -173,7 +172,6 @@ const ManageEventPage = () => {
                         <button type="submit" style={{ backgroundColor: '#007bff', color: 'white', padding: '10px', border: 'none' }}>Save Changes</button>
                     </form>
 
-                    {/* --- ORGANIZERS SECTION --- */}
                     <h3 style={{ marginTop: '30px' }}>Organizers</h3>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
                         {event.organizers?.map(org => (
@@ -193,7 +191,6 @@ const ManageEventPage = () => {
                     </div>
                 </div>
 
-                {/* --- RIGHT COLUMN: GUESTS & POINTS --- */}
                 <div>
                     <h3>Guest Management</h3>
                     <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>

@@ -10,13 +10,11 @@ const AllUsersPage = () => {
     const { token, user: currentUser } = useAuth();
     const navigate = useNavigate();
 
-    // State for Filters & Pagination
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('name'); 
 
-    // 1. ROBUST FETCH FUNCTION
     const fetchUsers = useCallback(async () => {
         try {
             const res = await axios.get(`${API_BASE_URL}/users`, {
@@ -51,9 +49,6 @@ const AllUsersPage = () => {
         fetchUsers();
     }, [fetchUsers]);
 
-    // --- ACTIONS ---
-
-    // 1. Promote Role
     const handleRoleUpdate = async (userId, newRole) => {
         if (!window.confirm(`Promote this user to ${newRole}?`)) return;
         try {
@@ -68,22 +63,19 @@ const AllUsersPage = () => {
         }
     };
 
-    // 2. Verify User
     const handleVerify = async (userId) => {
         try {
-            // FIX: Sending 'verified' (matches DB column) or 'isVerified' (matches backend alias)
             await axios.patch(`${API_BASE_URL}/users/${userId}`, 
                 { verified: true }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            fetchUsers(); // Refresh UI to update the list
+            fetchUsers();
         } catch (err) {
             console.error(err);
             alert("Verification failed.");
         }
     };
 
-    // 3. Toggle Suspicious
     const handleSuspiciousToggle = async (userId, currentStatus) => {
         const newStatus = !currentStatus;
         if (!window.confirm(`Mark this user as ${newStatus ? 'SUSPICIOUS' : 'Safe'}?`)) return;
@@ -99,7 +91,6 @@ const AllUsersPage = () => {
         }
     };
 
-    // Helper: Permission Check
     const canPromote = (targetRole) => {
         if (!currentUser) return false;
         if (currentUser.role === 'superuser') return true;
@@ -119,7 +110,6 @@ const AllUsersPage = () => {
                 </button>
             </div>
 
-            {/* --- FILTER & SORT BAR --- */}
             <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '20px', display: 'flex', gap: '15px' }}>
                 <input 
                     type="text" 
@@ -139,12 +129,10 @@ const AllUsersPage = () => {
 
             <ul style={{ listStyle: 'none', padding: 0 }}>
                 {Array.isArray(users) && users.map((u) => (
-                    // FIX: Using u.suspicious instead of u.isSuspicious
                     <li key={u.id || u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', borderBottom: '1px solid #eee', backgroundColor: u.suspicious ? '#fff3f3' : '#fff' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <strong>{u.name}</strong>
-                                {/* FIX: Using u.verified instead of u.isVerified */}
                                 {u.verified && <span title="Verified" style={{ cursor:'default' }}>✅</span>}
                                 {u.suspicious && <span style={{ color: 'red', fontWeight: 'bold', fontSize: '0.8rem', border: '1px solid red', padding: '2px 4px', borderRadius: '4px' }}>SUSPICIOUS</span>}
                             </div>
@@ -157,14 +145,11 @@ const AllUsersPage = () => {
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end' }}>
                             <div style={{ display: 'flex', gap: '5px' }}>
-                                {/* FIX: Using !u.verified */}
                                 {!u.verified && (
                                     <button onClick={() => handleVerify(u.id || u._id)} style={{...styles.actionBtn, backgroundColor: '#17a2b8'}}>
                                         Verify
                                     </button>
                                 )}
-                                
-                                {/* FIX: Using u.suspicious */}
                                 <button onClick={() => handleSuspiciousToggle(u.id || u._id, u.suspicious)} style={{...styles.actionBtn, backgroundColor: u.suspicious ? '#6c757d' : '#dc3545'}}>
                                     {u.suspicious ? 'Unflag' : 'Flag Suspicious'}
                                 </button>

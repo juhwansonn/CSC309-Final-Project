@@ -5,12 +5,11 @@ import { useAuth } from '../context/AuthContext';
 
 const CashierPage = () => {
     const { token } = useAuth();
-    
-    // Form State
+
     const [formData, setFormData] = useState({
         utorid: '',
         spent: '',
-        promotionIds: '' // Comma separated IDs (e.g. "1, 2")
+        promotionIds: ''
     });
 
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -26,12 +25,10 @@ const CashierPage = () => {
         setLoading(true);
 
         try {
-            // Prepare payload
             const payload = {
                 type: 'purchase',
                 utorid: formData.utorid,
                 spent: parseFloat(formData.spent),
-                // Convert "1,2,3" string -> [1, 2, 3] array
                 promotionIds: formData.promotionIds
                     ? formData.promotionIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
                     : []
@@ -41,14 +38,12 @@ const CashierPage = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            // Success!
             const earned = response.data.earned || 0;
             setMessage({ 
                 type: 'success', 
                 text: `Transaction Successful! User charged $${payload.spent} and earned ${earned} points.` 
             });
-            
-            // Clear only cost fields, keep utorid in case of repeat
+ 
             setFormData(prev => ({ ...prev, spent: '', promotionIds: '' }));
 
         } catch (err) {
@@ -80,8 +75,7 @@ const CashierPage = () => {
             )}
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                
-                {/* 1. Customer UTORid */}
+
                 <div>
                     <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Customer UTORid:</label>
                     <input 
@@ -94,7 +88,6 @@ const CashierPage = () => {
                     />
                 </div>
 
-                {/* 2. Amount Spent */}
                 <div>
                     <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Amount Spent ($):</label>
                     <input 
@@ -109,7 +102,6 @@ const CashierPage = () => {
                     />
                 </div>
 
-                {/* 3. Promotions (Optional) */}
                 <div>
                     <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Promotion IDs (Optional):</label>
                     <input 

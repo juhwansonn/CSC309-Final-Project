@@ -27,7 +27,6 @@ const RedeemPointsPage = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            // On success, show the Transaction ID so they can tell the cashier
             setSuccessId(response.data.id);
             setAmount('');
             setRemark('');
@@ -46,7 +45,6 @@ const RedeemPointsPage = () => {
                     <h3 style={{ color: 'green' }}>Request Created!</h3>
                     <p>Show this to the cashier:</p>
                     
-                    {/* QR Code for the Transaction ID */}
                     <div style={{ background: 'white', padding: '10px', display: 'inline-block', margin: '15px 0' }}>
                         <QRCode value={String(successId)} size={120} />
                     </div>

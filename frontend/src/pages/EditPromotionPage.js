@@ -16,14 +16,11 @@ const EditPromotionPage = () => {
         minSpending: '', rate: '', points: ''
     });
 
-    // Helper to format ISO date string for datetime-local input
     const formatForInput = (isoString) => {
         if (!isoString) return '';
-        // Slice to remove the seconds/milliseconds and 'Z' (e.g., "2025-12-01T12:00")
         return isoString.slice(0, 16); 
     };
 
-    // Fetch existing promotion data
     const fetchPromotion = useCallback(async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/promotions/${id}`, {
@@ -60,18 +57,15 @@ const EditPromotionPage = () => {
         e.preventDefault();
         setError('');
         try {
-            // Prepare the payload (only send fields that have values)
             const payload = {};
 
             if (formData.name) payload.name = formData.name;
             if (formData.description) payload.description = formData.description;
             if (formData.type) payload.type = formData.type;
-            
-            // Format dates back to ISO strings
+       
             if (formData.startTime) payload.startTime = new Date(formData.startTime).toISOString();
             if (formData.endTime) payload.endTime = new Date(formData.endTime).toISOString();
 
-            // Convert numbers, coercing empty strings to null or skipping them
             if (formData.minSpending !== '') payload.minSpending = parseFloat(formData.minSpending) || null;
             if (formData.rate !== '') payload.rate = parseFloat(formData.rate) || null;
             if (formData.points !== '') payload.points = parseInt(formData.points) || null;

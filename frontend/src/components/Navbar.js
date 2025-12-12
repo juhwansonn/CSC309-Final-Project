@@ -6,7 +6,6 @@ const Navbar = () => {
     const { user, logout, currentRole, allAvailableRoles, switchRole, ROLE_RANKS } = useAuth();
     const navigate = useNavigate();
 
-    // If the user is not logged in, do not render the navbar
     if (!user) {
         return null;
     }
@@ -16,28 +15,22 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    // Determine permissions based on the CURRENT ACTIVE ROLE
     const activeRole = (currentRole || user.role || '').toLowerCase();
-    // Assuming hierarchical: superuser > manager > cashier > regular
     const isManagerView = ROLE_RANKS[activeRole] >= ROLE_RANKS['manager'];
     const isCashierView = ROLE_RANKS[activeRole] >= ROLE_RANKS['cashier'];
     
-    // Check for multiple roles to decide if the dropdown should appear
     const showRoleSwitch = allAvailableRoles.length > 1;
 
-    // Helper for title casing roles in the UI
     const toTitleCase = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
     return (
         <nav style={styles.nav}>
             <div style={styles.container}>
                 <div style={styles.brand}>
-                    {/* ACTION: Clicking the brand logo redirects to the Dashboard (/) */}
                     <Link to="/" style={styles.brandLink}>Score Cart</Link>
                 </div>
 
                 <div style={styles.links}>
-                    {/* Common Links (Regular View) */}
                     <Link to="/profile" style={styles.link}>Profile</Link>
                     <Link to="/events" style={styles.link}>Events</Link>
                     <Link to="/promotions" style={styles.link}>Promotions</Link>
@@ -45,7 +38,6 @@ const Navbar = () => {
                     <Link to="/transfer" style={styles.link}>Transfer</Link>
                     <Link to="/redeem" style={styles.link}>Redeem</Link>
 
-                    {/* Cashier Links (Conditional on Active Role) */}
                     {isCashierView && (
                         <div style={styles.separator}>
                             <span style={{ color: '#aaa' }}>|</span>
@@ -54,7 +46,6 @@ const Navbar = () => {
                         </div>
                     )}
 
-                    {/* Manager Links (Conditional on Active Role) */}
                     {isManagerView && (
                         <div style={styles.separator}>
                             <span style={{ color: '#aaa' }}>|</span>
@@ -65,7 +56,6 @@ const Navbar = () => {
                 </div>
 
                 <div style={styles.auth}>
-                    {/* Role Switching Dropdown */}
                     {showRoleSwitch && (
                         <div style={styles.roleSwitch}>
                             <label htmlFor="role-select" style={{ marginRight: '5px', color: '#ccc' }}>View as:</label>
@@ -76,7 +66,7 @@ const Navbar = () => {
                                 style={styles.select}
                             >
                                 {allAvailableRoles
-                                    .sort((a, b) => ROLE_RANKS[b] - ROLE_RANKS[a]) // Sort descending (superuser first)
+                                    .sort((a, b) => ROLE_RANKS[b] - ROLE_RANKS[a]) 
                                     .map(role => (
                                         <option key={role} value={role}>
                                             {toTitleCase(role)}
@@ -99,7 +89,6 @@ const Navbar = () => {
     );
 };
 
-// Simple inline styles
 const styles = {
     nav: {
         backgroundColor: '#333',

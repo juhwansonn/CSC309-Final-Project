@@ -25,7 +25,6 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Routes>
-        {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         
         {/* Protected Routes (Authenticated) */}

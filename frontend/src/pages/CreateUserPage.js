@@ -30,10 +30,8 @@ const CreateUserPage = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            // The API returns a resetToken. In a real app, this is emailed.
-            // For this project, we display it so you can copy it.
             setSuccessMsg(`User created! Copy this Token to set their password: ${response.data.resetToken}`);
-            setFormData({ utorid: '', name: '', email: '' }); // Clear form
+            setFormData({ utorid: '', name: '', email: '' });
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.error || 'Failed to create user.');
@@ -73,7 +71,6 @@ const CreateUserPage = () => {
 
             {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
             
-            {/* IMPORTANT: Display the token so you can set the password later */}
             {successMsg && (
                 <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#d4edda', border: '1px solid #c3e6cb' }}>
                     <p style={{ wordBreak: 'break-all' }}><strong>{successMsg}</strong></p>

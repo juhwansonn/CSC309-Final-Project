@@ -9,15 +9,14 @@ const ManagerTransactionsPage = () => {
     const [error, setError] = useState('');
     const { token } = useAuth();
 
-    // Filters
     const [filterType, setFilterType] = useState('');
     const [sortOrder, setSortOrder] = useState('newest');
 
-    // 1. FIX: Wrap function in useCallback so it's stable
+
     const fetchTransactions = useCallback(async () => {
         try {
             setLoading(true);
-            setError(''); // Clear previous errors on new fetch
+            setError('');
             
             const res = await axios.get(`${API_BASE_URL}/transactions`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -37,14 +36,12 @@ const ManagerTransactionsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [token, filterType, sortOrder]); // Re-create only if these change
+    }, [token, filterType, sortOrder]);
 
-    // 2. FIX: Add function to dependency array
     useEffect(() => {
         fetchTransactions();
     }, [fetchTransactions]);
 
-    // Action: Flag Transaction as Suspicious
     const toggleSuspicious = async (txId, currentStatus) => {
         if (!window.confirm(`Mark transaction as ${!currentStatus ? 'Suspicious' : 'Safe'}?`)) return;
         try {
@@ -58,7 +55,6 @@ const ManagerTransactionsPage = () => {
         }
     };
 
-    // Action: Issue Adjustment
     const handleAdjustment = async (txId, userUtorid) => {
         const amountStr = prompt(`Enter adjustment amount for User ${userUtorid} (e.g. -50 to deduct, 50 to add):`);
         if (!amountStr) return;
@@ -70,13 +66,12 @@ const ManagerTransactionsPage = () => {
         }
 
         try {
-            // NOTE: Ensure your backend supports this structure or adapt as needed
             await axios.post(`${API_BASE_URL}/transactions`, 
                 { 
                     type: 'adjustment',
                     amount: amount,
-                    relatedId: txId, // Using relatedId as per schema
-                    utorid: userUtorid, // Explicitly linking to the user
+                    relatedId: txId,
+                    utorid: userUtorid, 
                     remark: `Adjustment for Tx #${txId}`
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
@@ -93,7 +88,6 @@ const ManagerTransactionsPage = () => {
         <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
             <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Global Transaction History</h1>
 
-            {/* Filters */}
             <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', padding: '15px', backgroundColor: '#f1f1f1', borderRadius: '5px' }}>
                 <select onChange={(e) => setFilterType(e.target.value)} value={filterType}>
                     <option value="">All Types</option>
@@ -109,7 +103,6 @@ const ManagerTransactionsPage = () => {
                 <button onClick={fetchTransactions} style={{ marginLeft: 'auto' }}>Refresh</button>
             </div>
 
-            {/* 3. FIX: Display the error so the variable is "used" */}
             {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
 
             {loading ? <p>Loading...</p> : (

@@ -31,17 +31,14 @@ const LoginPage = () => {
       });
 
       const { token } = response.data;
-      
-      // Fetch the role immediately after successful login
+  
       const userResponse = await axios.get(`${API_BASE_URL}/users/me`, {
           headers: { Authorization: `Bearer ${token}` }
       });
-      const userRole = userResponse.data.role; // Get the user's role
+      const userRole = userResponse.data.role;
 
-      // 1. Call the login function from AuthContext to save token
       login(token, userRole); 
 
-      // 2. Redirect to a home page or profile page
       navigate('/profile'); 
 
     } catch (err) {

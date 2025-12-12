@@ -15,14 +15,13 @@ const ProcessRedemptionPage = () => {
         setError('');
         
         try {
-            // Send request to mark as processed
             const response = await axios.patch(
                 `${API_BASE_URL}/transactions/${txId}/processed`, 
                 { processed: true }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            setStatus(`✅ Success! Redeemed ${response.data.amount} points for user ${response.data.utorid}.`);
+            setStatus(`Success! Redeemed ${response.data.amount} points for user ${response.data.utorid}.`);
             setTxId('');
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to process. Check ID.');

@@ -1,4 +1,3 @@
-// frontend/src/pages/CreateEventPage.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +21,6 @@ const CreateEventPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Backend expects numbers for capacity and points
             const payload = {
                 ...formData,
                 capacity: parseInt(formData.capacity),
@@ -34,8 +32,6 @@ const CreateEventPage = () => {
             await axios.post(`${API_BASE_URL}/events`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-
-            // Redirect back to the events list
             navigate('/events');
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to create event');

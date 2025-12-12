@@ -11,8 +11,7 @@ const DashboardPage = () => {
     const [recentTransactions, setRecentTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    
-    // Helper to determine the dashboard greeting based on role
+
     const getGreeting = () => {
         if (!user) return 'Welcome!';
         const role = currentRole || user.role;
@@ -26,8 +25,7 @@ const DashboardPage = () => {
                 return `Welcome back, ${user.name}`;
         }
     };
-    
-    // Logic for Transaction Display (reused from TransactionsPage)
+
     const formatTransaction = (tx) => {
         let details = tx.remark || '—';
         let typeLabel = tx.type;
@@ -40,17 +38,17 @@ const DashboardPage = () => {
         if (tx.type === 'transfer') {
             if (tx.amount < 0) {
                 typeLabel = "Sent";
-                typeColor = '#d9534f'; // Red
+                typeColor = '#d9534f';
                 details = `To: @${tx.relatedUserUtorid || 'Unknown'}`;
             } else {
                 typeLabel = "Received";
-                typeColor = '#28a745'; // Green
+                typeColor = '#28a745';
                 details = `From: @${tx.relatedUserUtorid || 'Unknown'}`;
             }
         } else if (tx.type === 'purchase') {
-            typeColor = '#007bff'; // Blue
+            typeColor = '#007bff';
         } else if (tx.type === 'redemption') {
-            typeColor = '#fd7e14'; // Orange
+            typeColor = '#fd7e14';
         }
 
         const amountColor = displayAmount >= 0 ? 'green' : 'red';
@@ -65,7 +63,6 @@ const DashboardPage = () => {
             if (!token || authLoading) return;
             
             try {
-                // Fetch only 5 most recent transactions
                 const response = await axios.get(`${API_BASE_URL}/users/me/transactions`, {
                     headers: { Authorization: `Bearer ${token}` },
                     params: {
@@ -87,14 +84,12 @@ const DashboardPage = () => {
     if (authLoading || loading) {
         return <div style={{ padding: '20px', textAlign: 'center' }}>Loading Dashboard...</div>;
     }
-    
-    // Fallback if auth is still broken (shouldn't happen with ProtectedRoute)
+
     if (!user) return navigate('/login');
 
     return (
         <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-            
-            {/* --- TOP SECTION: BALANCE & ACTIONS --- */}
+
             <div style={styles.header}>
                 <h2 style={styles.greeting}>{getGreeting()}</h2>
                 
@@ -111,8 +106,7 @@ const DashboardPage = () => {
             </div>
 
             {error && <p style={{ color: 'red', marginTop: '20px' }}>{error}</p>}
-            
-            {/* --- BOTTOM SECTION: RECENT ACTIVITY --- */}
+
             <div style={{ marginTop: '40px' }}>
                 <h3 style={styles.activityHeader}>Recent Activity</h3>
                 

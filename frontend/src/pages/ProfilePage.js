@@ -12,9 +12,6 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // We need to fetch 'me' again to ensure we have the latest points/promotions
-        // The token is automatically handled if you set it in axios defaults, 
-        // otherwise we grab it from localStorage or context.
         const token = localStorage.getItem('jwt_token');
         const response = await axios.get(`${API_BASE_URL}/users/me`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -68,7 +65,6 @@ const ProfilePage = () => {
       <div style={{ textAlign: 'center', margin: '30px 0' }}>
         <h3>My Member QR Code</h3>
         <div style={{ background: 'white', padding: '16px', display: 'inline-block', border: '1px solid #ccc' }}>
-            {/* The QR code contains the UtorID */}
             <QRCode value={user.utorid} size={150} />
         </div>
         <p style={{ fontSize: '0.9em', color: '#666' }}>Show this to a cashier to earn points</p>

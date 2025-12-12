@@ -10,7 +10,6 @@ const EventsPage = () => {
     const { user, token } = useAuth();
     const navigate = useNavigate();
 
-    // State for Pagination & Sorting
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [sortOrder, setSortOrder] = useState('date_asc'); 
@@ -73,7 +72,6 @@ const EventsPage = () => {
                 )}
             </div>
 
-            {/* --- SORT BAR --- */}
             <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '5px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <label style={{ fontWeight: 'bold' }}>Sort By:</label>
                 <select 
@@ -98,7 +96,6 @@ const EventsPage = () => {
                             <h3 style={{margin: 0}}>{event.name}</h3>
                             
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                {/* Join Button */}
                                 <button 
                                     onClick={() => handleRSVP(event.id)}
                                     style={{ backgroundColor: '#007bff', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
@@ -106,10 +103,8 @@ const EventsPage = () => {
                                     Join
                                 </button>
 
-                                {/* Manager Buttons */}
                                 {isManager && (
                                     <>
-                                        {/* NEW: Manage Button */}
                                         <button 
                                             onClick={() => navigate(`/events/${event.id}/manage`)}
                                             style={{ backgroundColor: '#ffc107', color: 'black', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
@@ -139,7 +134,6 @@ const EventsPage = () => {
                 {events.length === 0 && <p style={{ textAlign: 'center', color: '#666' }}>No events found.</p>}
             </div>
 
-            {/* --- Pagination --- */}
             {totalPages > 1 && (
                 <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
                     <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} style={{ padding: '8px 16px', cursor: page <= 1 ? 'not-allowed' : 'pointer' }}>Previous</button>

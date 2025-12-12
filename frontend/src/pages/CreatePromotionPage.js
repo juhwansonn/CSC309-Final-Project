@@ -1,4 +1,3 @@
-// frontend/src/pages/CreatePromotionPage.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +12,7 @@ const CreatePromotionPage = () => {
     const [formData, setFormData] = useState({
         name: '', 
         description: '', 
-        type: 'automatic', // Default to automatic
+        type: 'automatic',
         startTime: '', 
         endTime: '', 
         minSpending: '',
@@ -28,14 +27,12 @@ const CreatePromotionPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Prepare the payload
             const payload = {
                 name: formData.name,
                 description: formData.description,
                 type: formData.type,
                 startTime: new Date(formData.startTime).toISOString(),
                 endTime: new Date(formData.endTime).toISOString(),
-                // Convert to number only if user typed something, otherwise null
                 minSpending: formData.minSpending ? parseFloat(formData.minSpending) : null,
                 rate: formData.rate ? parseFloat(formData.rate) : null,
                 points: formData.points ? parseInt(formData.points) : null,
