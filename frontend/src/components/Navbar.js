@@ -6,6 +6,7 @@ const Navbar = () => {
     const { user, logout, currentRole, allAvailableRoles, switchRole, ROLE_RANKS } = useAuth();
     const navigate = useNavigate();
 
+    // If the user is not logged in, do not render the navbar
     if (!user) {
         return null;
     }
@@ -17,6 +18,7 @@ const Navbar = () => {
 
     // Determine permissions based on the CURRENT ACTIVE ROLE
     const activeRole = (currentRole || user.role || '').toLowerCase();
+    // Assuming hierarchical: superuser > manager > cashier > regular
     const isManagerView = ROLE_RANKS[activeRole] >= ROLE_RANKS['manager'];
     const isCashierView = ROLE_RANKS[activeRole] >= ROLE_RANKS['cashier'];
     
@@ -30,7 +32,8 @@ const Navbar = () => {
         <nav style={styles.nav}>
             <div style={styles.container}>
                 <div style={styles.brand}>
-                    <Link to="/profile" style={styles.brandLink}>CSSU Rewards</Link>
+                    {/* ACTION: Clicking the brand logo redirects to the Dashboard (/) */}
+                    <Link to="/" style={styles.brandLink}>CSSU Rewards</Link>
                 </div>
 
                 <div style={styles.links}>
@@ -96,6 +99,7 @@ const Navbar = () => {
     );
 };
 
+// Simple inline styles
 const styles = {
     nav: {
         backgroundColor: '#333',
