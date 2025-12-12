@@ -12,10 +12,14 @@ import TransactionsPage from './pages/TransactionsPage';
 import TransferPage from './pages/TransferPage';
 import RedeemPointsPage from './pages/RedeemPointsPage';
 import ProcessRedemptionPage from './pages/ProcessRedemptionPage';
+import Navbar from './components/NavBar';
+
 
 function App() {
   return (
     <BrowserRouter>
+
+      <Navbar />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
