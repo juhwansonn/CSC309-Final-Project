@@ -43,6 +43,8 @@ const Navbar = () => {
                     {isCashier && (
                         <div style={styles.separator}>
                             <span style={{ color: '#aaa' }}>|</span>
+                            <Link to="/cashier" style={styles.link}>Charge</Link> 
+                            
                             <Link to="/redeem/process" style={styles.link}>Process</Link>
                         </div>
                     )}

@@ -14,6 +14,7 @@ import RedeemPointsPage from './pages/RedeemPointsPage';
 import ProcessRedemptionPage from './pages/ProcessRedemptionPage';
 import Navbar from './components/Navbar';
 import CreateUserPage from './pages/CreateUserPage';
+import CashierPage from './pages/CashierPage';
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
         {/* Cashier Routes */}
         <Route element={<ProtectedRoute requiredRole="cashier" />}>
         <Route path="/redeem/process" element={<ProcessRedemptionPage />} />
+        <Route path="/cashier" element={<CashierPage />} />
           {/* Add Cashier pages here */}
         </Route>
 
