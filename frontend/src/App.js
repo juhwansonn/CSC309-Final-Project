@@ -12,7 +12,7 @@ import TransactionsPage from './pages/TransactionsPage';
 import TransferPage from './pages/TransferPage';
 import RedeemPointsPage from './pages/RedeemPointsPage';
 import ProcessRedemptionPage from './pages/ProcessRedemptionPage';
-import Navbar from './components/NavBar';
+import Navbar from './components/Navbar';
 
 
 function App() {
