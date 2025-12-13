@@ -101,8 +101,35 @@
     Regular User:
         - ID: reguser01 # to reguser10
         - Password: Password123! 
+
+5. Key features and hehaviour to be tested:
+    - Authenticate & Profile: 
+        - '/login': User authentication. Returns a JWT stored in memory.
+        - '/profile': Displays User Info like balance, ID, and QR code representing the user.
+
+    - Events Management:
+        - '/events: Lists all upcoming events with Pagination (Create more than 5 events to see the button "Next")
+        - '/events/new': (Manager/Superuser Only ) Create a new event. Regular users cannot access this.
+        - '/events/:id/edit': (Manager/Superuser Only) Form to update event details (access via Edit button on Event list).
+
+    - Promotions Management: 
+        - '/promotions': View all active promotional offers.
+        - '/promotions/new': (Manager/Superuser Only) Create a new promotion.
+        - '/promotions/:id': (Manager/Superuser Only) Edit an existing promotion.
+
+    - Transactions: 
+        - '/transfer': Allows transferring points to another user via their UtorID.
+        - '/transactions': View personal transaction history (transfers, redemptions, purchases).
+        - '/redemption': Generates a redemption request with a unique QR Code for the transaction.
+        - '/process-redemption': (Cashier/Manager/Superuser Only) Validates and approves redemption request
+        - '/manager/transactions': (Manager/Superuser Only) View the global history of all system transactions.
+
+    - Administration:
+        - '/users': (Manager/Superuser Only ) Lists all registered users and their roles.
+        - '/promotions/new': (Manager/Superuser Only) Create new promotional offers.
+
     
-5. Architecture & Tech Stack Architecture: 
+6. Architecture & Tech Stack Architecture: 
     The project follows a client-server architecture. 
     - The frontend is a Single Page Application that communicates with the RESTful backend API via HTTP requests. 
     - The backend manages state and data persistence using Prisma ORM.
