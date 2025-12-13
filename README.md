@@ -1,1 +1,34 @@
+# ScoreCart
+Express + Prisma (SQLite) backend with a React frontend.
 
+## Layout
+- `backend/`: Node.js API (Express, Prisma, SQLite by default).
+- `frontend/`: React app (CRA-based) consuming the API.
+- `INSTALL`: Full prerequisites, setup commands, env vars, database steps, and Railway deployment.
+
+## Prerequisites
+- Node.js 18+ (includes npm), Git, and SQLite CLI (optional for inspecting the local DB).
+- See `INSTALL` for OS-specific install commands and verification steps.
+
+## Quickstart (development)
+1. Clone: `git clone https://github.com/juhwansonn/ScoreCart && cd ScoreCart`
+2. Backend deps: `cd backend && npm install` (runs Prisma generate + db push + seed via `postinstall`)
+3. Frontend deps: `cd ../frontend && npm install`
+4. Env files (see `INSTALL` for exact values):
+   - `backend/.env`: `PORT`, `JWT_SECRET`, `FRONTEND_URL`
+   - `frontend/.env`: `REACT_APP_API_URL`
+5. Run:
+   - Backend: `cd backend && npm start` (http://localhost:8000)
+   - Frontend dev: `cd frontend && npm run dev` (http://localhost:3000)
+   - Optional prod preview: `cd frontend && npm run build && npx serve -s build -l 3000`
+
+## Database
+- Prisma uses SQLite at `backend/prisma/dev.db`.
+- Migrate/seed manually if needed: `cd backend && npx prisma migrate dev --name init && npm run seed`.
+
+## Deployment (Railway)
+- Summary: create two Railway services from this repo—`backend/` (install `npm install`, start `npm start`) and `frontend/` (install `npm install && npm run build`, start `npx serve -s build -l tcp://0.0.0.0:$PORT`).
+- Env vars:
+  - Backend: `JWT_SECRET`, `FRONTEND_URL`, `PORT` (platform-provided)
+  - Frontend: `REACT_APP_API_URL`
+- Full steps and notes (including running both on one machine) are in `INSTALL`.
