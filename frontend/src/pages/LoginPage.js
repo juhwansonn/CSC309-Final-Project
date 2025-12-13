@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../api/config';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../api/config";
 
 const LoginPage = () => {
-  const [utorid, setUtorid] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [utorid, setUtorid] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const { login, token } = useAuth();
   const navigate = useNavigate();
@@ -15,13 +15,13 @@ const LoginPage = () => {
   useEffect(() => {
     // If user is already authenticated (token exists), redirect to dashboard
     if (token) {
-      navigate('/');
+      navigate("/");
     }
   }, [token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/tokens`, {
@@ -30,20 +30,22 @@ const LoginPage = () => {
       });
 
       const { token: jwtToken } = response.data;
-  
+
       const userResponse = await axios.get(`${API_BASE_URL}/users/me`, {
-          headers: { Authorization: `Bearer ${jwtToken}` }
+        headers: { Authorization: `Bearer ${jwtToken}` },
       });
       const userRole = userResponse.data.role;
 
-      login(jwtToken, userRole); 
+      login(jwtToken, userRole);
 
       // Redirect to the dashboard/root page
-      navigate('/'); 
-
+      navigate("/");
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || 'Login failed. Check UTORid and password.');
+      setError(
+        err.response?.data?.message ||
+          "Login failed. Check UTORid and password."
+      );
     }
   };
 
@@ -69,78 +71,82 @@ const LoginPage = () => {
             required
             style={styles.input}
           />
-          <button type="submit" style={styles.button}>Log In</button>
+          <button type="submit" style={styles.button}>
+            Log In
+          </button>
         </form>
         {error && <p style={styles.error}>{error}</p>}
         <p style={styles.footerLink}>
-          <button onClick={() => navigate('/reset-password')} style={styles.resetButton}>
-              Forgot Password?
+          <button
+            onClick={() => navigate("/reset-password")}
+            style={styles.resetButton}
+          >
+            Forgot Password?
           </button>
         </p>
       </div>
     </div>
   );
 };
-
 const styles = {
-    container: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '80vh', // Ensures centering vertically in the viewport
-        backgroundColor: '#f4f4f9',
-    },
-    loginBox: {
-        width: '100%',
-        maxWidth: '380px',
-        padding: '30px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        borderRadius: '8px',
-        backgroundColor: '#fff',
-        textAlign: 'center',
-    },
-    header: {
-        marginBottom: '25px',
-        color: '#333',
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '15px',
-    },
-    input: {
-        padding: '12px',
-        border: '1px solid #ddd',
-        borderRadius: '4px',
-        fontSize: '16px',
-    },
-    button: {
-        padding: '12px',
-        backgroundColor: '#007bff',
-        color: 'white',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontSize: '16px',
-        fontWeight: 'bold',
-        transition: 'background-color 0.3s',
-    },
-    error: {
-        color: '#dc3545',
-        marginTop: '15px',
-        fontWeight: 'bold',
-    },
-    footerLink: {
-        marginTop: '20px',
-    },
-    resetButton: {
-        background: 'none',
-        border: 'none',
-        color: '#007bff',
-        cursor: 'pointer',
-        fontSize: '14px',
-        padding: 0,
-    }
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "80vh", // Ensures centering vertically in the viewport
+    backgroundColor: "#f4f4f9",
+  },
+  loginBox: {
+    width: "100%",
+    maxWidth: "380px",
+    padding: "30px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    borderRadius: "8px",
+    backgroundColor: "#fff",
+    textAlign: "center",
+  },
+  header: {
+    marginBottom: "25px",
+    color: "#333",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
+  input: {
+    padding: "12px",
+    border: "1px solid #ddd",
+    borderRadius: "4px",
+    fontSize: "16px",
+  },
+  button: {
+    padding: "12px",
+    backgroundColor: "#007bff",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "16px",
+    fontWeight: "bold",
+    transition: "background-color 0.3s",
+  },
+  error: {
+    color: "#dc3545",
+    marginTop: "15px",
+    fontWeight: "bold",
+  },
+  footerLink: {
+    marginTop: "20px",
+  },
+  resetButton: {
+    background: "none",
+    border: "none",
+    color: "#007bff",
+    cursor: "pointer",
+    fontSize: "14px",
+    padding: 0,
+  },
 };
 
 export default LoginPage;
